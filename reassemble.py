@@ -1,42 +1,173 @@
-import argparse
 import os
-import time
+import sys
 import logging
+import argparse
+import shutil
+from datetime import datetime
+import qrcode
+import argparse
+import uuid
+import zlib
+from pyzbar import pyzbar
 
-def reassemble_blocks(input_dir, output_file):
-    # Get the base name and extension of the output file
-    base_name, extension = os.path.splitext(os.path.basename(output_file))
+import qrcode
+from PIL import Image
+import argparse
+from pyzbar.pyzbar import decode
+from PIL import Image
 
-    # Get a list of block files in the input directory
-    block_files = [filename for filename in os.listdir(input_dir) if filename.startswith(f"{base_name}_block")]
 
-    # Sort the block files based on the block number
-    block_files.sort(key=lambda x: int(x.split('_block')[1].split('.')[0]))
+# # # # file_path = "output_file.gz"
 
-    # Open the output file in binary mode for writing
-    with open(output_file, 'wb') as output:
-        # Reassemble the blocks into the output file
-        for block_file in block_files:
-            # Read the contents of the current block file
-            block_path = os.path.join(input_dir, block_file)
-            with open(block_path, 'rb') as block:
-                block_contents = block.read()
+# # # # with open(file_path, "rb") as file:
+# # # #     # Read the first byte
+# # # #     first_byte = file.read(1)
 
-            # Write the contents of the current block to the output file
-            output.write(block_contents)
 
-            # Log the block reassembly with time and date
-            logging.info(f"Reassembled {block_file} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
 
-if __name__ == "__main__":
-    # Set up the command-line argument parser
-    parser = argparse.ArgumentParser(description='Reassemble blocks into the original file.')
-    parser.add_argument('input_dir', help='path to the directory containing the blocks')
-    parser.add_argument('output_file', help='path to the output file')
+# # # # # Convert the first byte to an integer
+# # # # integer_value = int.from_bytes(first_byte, byteorder='big')
+
+# # # # print(integer_value)
+
+
+
+#SI DOSSIER OUTPUT par default N'EXISTE PAS, DEMANDER à LE CREER
+def create_output_directory(output_dir):
+    if not os.path.exists(output_dir):
+        print(f"The output directory '{output_dir}' does not exist.")
+        choice = input("Do you want to create it? (y/n): ")
+        if choice.lower() == 'y':
+            os.makedirs(output_dir)
+        else:
+            print("Output directory not created. Exiting.")
+            sys.exit(1)
+
+
+
+
+
+def setup_logging(logs_file):
+    """Configure logging to write to the specified logs file."""
+    logging.basicConfig(
+        filename=logs_file,
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
+
+
+
+
+
+
+
+def qrcode_to_file(qrcode_path, output_path):
+    # Load the QR code image
+    qr_image = Image.open(qrcode_path)
+
+    # Convert the image to grayscale
+    qr_image = qr_image.convert('L')
+
+    # Decode the QR code
+    qr_codes = pyzbar.decode(qr_image)
+
+    if qr_codes:
+        # Get the decoded content from the first QR code
+        qr_content = qr_codes[0].data
+
+        # Save the decoded content to a file
+        with open(output_path, 'wb') as file:
+            file.write(qr_content)
+    else:
+        print("No QR code found in the image.")
+
+
+
+
+
+
+def main():
+    parser = argparse.ArgumentParser(description='File Assembler')
+    parser.add_argument('directory_path', type=str, help='path to the directory with the qr codes')
+    parser.add_argument('-o', '--output-dir', type=str, default='filesoutput', help='output directory')
     args = parser.parse_args()
 
-    # Set up logging to a file
-    logging.basicConfig(filename='reassemble_blocks.log', level=logging.INFO)
 
-    # Reassemble the blocks into the original file
-    reassemble_blocks(args.input_dir, args.output_file)
+    logs_file = 'file_assembler_logs.txt'
+    setup_logging(logs_file)
+
+    logging.info(f"File assembler started:")
+    logging.info(f"Output Directory: {args.output_dir}")
+    
+
+    create_output_directory(args.output_dir)
+
+
+
+    my_files = []
+
+    # Get a list of all files in the directory
+    file_list = os.listdir(args.directory_path)
+
+    # Generate QR code for each file
+    for file_name in file_list:
+        file_path = os.path.join(args.directory_path, file_name)
+        # print(file_path)
+        # print(f"filesoutput\{file_name}.gz"'')
+        qrcode_to_file(file_path, f"filesoutput\{file_name}.gz"'')
+        
+        ff = f"filesoutput\{file_name}.gz"''
+        with open(ff, "rb") as file:
+            print(ff)
+            # Read the first byte
+            first_byte = file.read(1)
+            integer_value = int.from_bytes(first_byte, byteorder='big')
+            print(integer_value)
+            number_and_filename = {ff : integer_value}
+            my_files.append(number_and_filename)
+            
+    print(my_files)
+
+
+
+
+        # Convert the first byte to an integer
+
+    # for filename in os.listdir(args.directory_path):
+    #     file_path = os.path.join(args.directory_path, filename)
+    #     qrcode_to_file(file_path, args.output_dir)
+
+
+
+
+
+
+
+
+
+
+    logging.info("File assembler completed.")
+
+if __name__ == '__main__':
+    main()
+
+
+
+#     return binary_data
+
+# def save_binary_data(binary_data, output_path):
+#     if binary_data is None:
+#         return
+
+#     with open(output_path, 'wb') as file:
+#         file.write(binary_data.encode('utf-8'))
+
+# # Usage example
+# png_path = 'output/00e95714-f181-4093-af0e-1ac0ab12df2d.png'
+# output_path = 'output_file.gz'
+
+# binary_data = decode_qr_code(png_path)
+# save_binary_data(binary_data, output_path)
+
+
