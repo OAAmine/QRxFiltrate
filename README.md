@@ -126,10 +126,10 @@ Here are a few examples of how to use QRxFiltrate:
 
 ## Contributing
 
-Contributions to QRxFiltrate are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request on the [GitHub repository](https://github.com/your-username/QRxFiltrate).
+Contributions to QRxFiltrate are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request on the [GitHub repository](https://github.com/OAAmine/QRxFiltrate).
 
 When contributing, please ensure to follow the existing code style and include appropriate tests for your changes.
 
 ## License
 
-QRxFiltrate is licensed under the [MIT License](LICENSE). Feel free to modify and distribute the tool as per the terms of the license.
+QRxFiltrate is licensed under the [GPL-3](LICENSE). Feel free to modify and distribute the tool as per the terms of the license.
